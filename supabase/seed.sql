@@ -13,44 +13,42 @@ INSERT INTO projects (
     star_result
 ) VALUES 
 (
-    'Autonomous Code Review Agent',
-    'An AI-driven developer tool that automatically reviews git pull requests, checks for lint/security issues, and comments with recommended code edits directly on GitHub commits.',
+    'Intelligent Supply Chain & Fleet Optimization Engine',
+    'An AI-powered forecasting and optimization system engineered to predict multi-modal transit bottlenecks and streamline fleet distribution algorithms for high-volume logistics.',
     ARRAY[
-        'https://images.unsplash.com/photo-1618401471353-b98aedd07871?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80'
+        'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1519003722824-192d992a6020?auto=format&fit=crop&w=800&q=80'
     ],
-    'https://code-reviewer-agent.example.com',
-    'https://github.com/example/code-reviewer-agent',
-    ARRAY['Next.js', 'TypeScript', 'Node.js', 'OpenAI API', 'GitHub REST API', 'Supabase', 'Tailwind CSS'],
+    'https://logistics-optimization.example.com',
+    'https://github.com/example/logistics-optimization',
+    ARRAY['Python', 'FastAPI', 'Scikit-Learn', 'LightGBM', 'Supabase', 'PostgreSQL'],
     ARRAY[
-        'Real-time webhook integration with GitHub repositories',
-        'Deep AST analysis combined with GPT-4 for high-confidence refactoring suggestions',
-        'Interactive code diff generation inside review comments',
-        'Extensible plugin system for custom team guidelines'
+        'Real-time route bottleneck alerting',
+        'Predictive transit delay mapping',
+        'Automated fleet relocation recommendations'
     ],
-    'Large software engineering teams often lose significant velocity waiting for peer code reviews. Minor bugs, style issues, and security vulnerabilities frequently slip through because reviews are rushed.',
-    'Build a fully automated code reviewer assistant that triggers on Pull Requests, performs analysis, and provides contextual inline feedback directly on GitHub within 2 minutes of submission.',
-    'Leveraged Node.js to spin up an event-driven server handling GitHub webhooks. Parsed incoming git diffs and context. Fed sections of the codebase to GPT-4 via prompt-engineered LLM pipelines with strict system guidelines. Stored PR analysis records in Supabase and displayed live dashboard stats via Next.js and Tailwind CSS.',
-    'Decreased average PR merge time by 32% across 5 active test teams. Caught 14 high-severity security vulnerabilities (API leaks, SQL injection paths) before they reached staging, while eliminating trivial style comments from human code review rounds.'
+    'A massive multi-modal logistics operation faced structural delivery variances and increased operational costs due to unforeseen transit bottlenecks and inefficient vehicle positioning.',
+    'Build an end-to-end predictive analytics engine to anticipate congestion periods and optimize vehicle allocation metrics across regional hubs.',
+    'Engineered robust feature sets from extensive historical GPS transit logs, trained a highly tuned LightGBM regressor to forecast delivery delays, and exposed predictions via a secure, modular FastAPI routing structure.',
+    'Successfully reduced delivery arrival variance by 14%, optimized asset allocation efficiency, and dramatically mitigated redundant transit run-times.'
 ),
 (
-    'Real-time Collaborative Whiteboard',
-    'A high-performance interactive whiteboarding tool that enables teams to draw, add sticky notes, and collaborate in real-time with zero-latency synchronization.',
+    'Agentic Code Review & Optimization Assistant',
+    'A production-ready LLM-powered development workflow agent that automatically reviews git patch sets, flags optimization vulnerabilities, and submits refactoring suggestions.',
     ARRAY[
-        'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1542744094-3a31f103e35f?auto=format&fit=crop&w=800&q=80'
-    ],
-    'https://draw-sync.example.com',
-    'https://github.com/example/draw-sync',
-    ARRAY['React', 'Vite', 'TypeScript', 'Socket.io', 'Node.js', 'Canvas API', 'Framer Motion'],
+        'https://images.unsplash.com/photo-1607799279861-4dd421887fb3?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=800&q=80'
+      ],
+    'https://agentic-reviewer.example.com',
+    'https://github.com/example/agentic-reviewer',
+    ARRAY['Next.js', 'TypeScript', 'Gemini API', 'Supabase RLS', 'Vector Embeddings'],
     ARRAY[
-        'Multi-user live cursor and drawing tracking with custom colors',
-        'Vector-based shape resizing, drawing, and text manipulation',
-        'Infinite canvas workspace with panning and zoom controls',
-        'Export options for PNG, SVG, and high-fidelity PDF format'
+        'Automated code style/security analysis',
+        'Context-aware semantic patch checks',
+        'Contextual embedding search over codebase structures'
     ],
-    'During remote planning sessions, traditional screensharing tools fell short of allowing true interactive brainstorming, leaving team members passive listeners rather than active visual contributors.',
-    'Develop an interactive, scalable web whiteboard application that supports up to 100 concurrent drawing sessions per board, keeping latency under 50ms for smooth real-time rendering.',
-    'Implemented the frontend canvas using raw HTML5 Canvas API and customized hook logic for shape math. Orchestrated backend synchronization utilizing WebSockets (Socket.io) backed by Redis adapter for message distribution. Used Framer Motion to animate UI panels, modal drawers, and tools menus, preserving a clean workspace.',
-    'Achieved sub-20ms rendering lag, offering a buttery-smooth drawing feel. Built modular room state persistence, enabling users to return to boards exactly as they left them. Used successfully by 3 department teams for retrospective sessions.'
+    'Development speed in fast-moving engineering teams was constrained by manual, repetitive merge request reviews and static code analysis noise.',
+    'Architect a reliable, context-aware LLM pipeline capable of acting as an autonomous peer reviewer to flag critical logic flaws prior to main branch integration.',
+    'Built an asynchronous processing pipeline utilizing the Gemini API to parse diff fragments, built a vector retrieval system over regional coding standards, and structured strict JSON schemas for precise parsing.',
+    'Accelerated continuous integration code validation cycles by 35% and captured critical edge-case structural exceptions prior to production deployment.'
 );
