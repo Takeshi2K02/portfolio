@@ -2,7 +2,17 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Code2, Terminal, Cpu, X, ExternalLink, Check } from 'lucide-react';
+import { 
+  ArrowRight, 
+  Terminal, 
+  Cpu, 
+  X, 
+  Check, 
+  Database, 
+  Copy,
+  Layers,
+  ArrowDown
+} from 'lucide-react';
 import { Project } from '@/types/project';
 import { supabase } from '@/lib/supabaseClient';
 
@@ -13,20 +23,19 @@ const FALLBACK_PROJECTS: Project[] = [
     title: 'Intelligent Supply Chain & Fleet Optimization Engine',
     description: 'An AI-powered forecasting and optimization system engineered to predict multi-modal transit bottlenecks and streamline fleet distribution algorithms for high-volume logistics.',
     images: [
-      'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1519003722824-192d992a6020?auto=format&fit=crop&w=800&q=80'
+      'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80'
     ],
     live_link: 'https://logistics-optimization.example.com',
     github_link: 'https://github.com/example/logistics-optimization',
     tech_stack: ['Python', 'FastAPI', 'Scikit-Learn', 'LightGBM', 'Supabase', 'PostgreSQL'],
     key_features: [
-      'Real-time route bottleneck alerting',
-      'Predictive transit delay mapping',
-      'Automated fleet relocation recommendations'
+      'Real-time route bottleneck alerting via stream processor',
+      'Predictive transit delay mapping using LightGBM regressor',
+      'Automated fleet relocation heuristics for optimal distribution'
     ],
     star_situation: 'A massive multi-modal logistics operation faced structural delivery variances and increased operational costs due to unforeseen transit bottlenecks and inefficient vehicle positioning.',
-    star_task: 'Build an end-to-end predictive analytics engine to anticipate congestion periods and optimize vehicle allocation metrics across regional hubs.',
-    star_action: 'Engineered robust feature sets from extensive historical GPS transit logs, trained a highly tuned LightGBM regressor to forecast delivery delays, and exposed predictions via a secure, modular FastAPI routing structure.',
+    star_task: 'Architect a predictive model to forecast congestion points and build an optimization algorithm to relocate assets to highest-probability demand hubs.',
+    star_action: 'Engineered spatial-temporal features from raw telemetry logs, trained a LightGBM regressor for time-to-destination prediction, and wrapped the pipeline in a multi-threaded FastAPI service.',
     star_result: 'Successfully reduced delivery arrival variance by 14%, optimized asset allocation efficiency, and dramatically mitigated redundant transit run-times.',
     created_at: new Date().toISOString()
   },
@@ -35,29 +44,78 @@ const FALLBACK_PROJECTS: Project[] = [
     title: 'Agentic Code Review & Optimization Assistant',
     description: 'A production-ready LLM-powered development workflow agent that automatically reviews git patch sets, flags optimization vulnerabilities, and submits refactoring suggestions.',
     images: [
-      'https://images.unsplash.com/photo-1607799279861-4dd421887fb3?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=800&q=80'
+      'https://images.unsplash.com/photo-1607799279861-4dd421887fb3?auto=format&fit=crop&w=800&q=80'
     ],
     live_link: 'https://agentic-reviewer.example.com',
     github_link: 'https://github.com/example/agentic-reviewer',
     tech_stack: ['Next.js', 'TypeScript', 'Gemini API', 'Supabase RLS', 'Vector Embeddings'],
     key_features: [
-      'Automated code style/security analysis',
-      'Context-aware semantic patch checks',
-      'Contextual embedding search over codebase structures'
+      'Context-aware patch analysis using structured LLM schemas',
+      'Codebase semantic search using high-dimensional embeddings',
+      'Automated security vulnerability checks on modified files'
     ],
     star_situation: 'Development speed in fast-moving engineering teams was constrained by manual, repetitive merge request reviews and static code analysis noise.',
-    star_task: 'Architect a reliable, context-aware LLM pipeline capable of acting as an autonomous peer reviewer to flag critical logic flaws prior to main branch integration.',
+    star_task: 'Build a contextual reviewer assistant that checks diff sets against security principles and semantic definitions in real-time.',
     star_action: 'Built an asynchronous processing pipeline utilizing the Gemini API to parse diff fragments, built a vector retrieval system over regional coding standards, and structured strict JSON schemas for precise parsing.',
     star_result: 'Accelerated continuous integration code validation cycles by 35% and captured critical edge-case structural exceptions prior to production deployment.',
     created_at: new Date().toISOString()
   }
 ];
 
+// Stat metric values mapped per project ID
+const DRAWER_STATS: Record<string, { label: string; value: string; desc: string }[]> = {
+  '1': [
+    { label: 'VARIANCE_REDUX', value: '14%', desc: 'Arrival variance decrease' },
+    { label: 'GEO_FEATURES', value: '256+', desc: 'Spatial-temporal signals' },
+    { label: 'DISPATCH_LATENCY', value: '0.45ms', desc: 'FastAPI routing speed' },
+  ],
+  '2': [
+    { label: 'VALIDATION_ACCEL', value: '35%', desc: 'CI/CD pipeline speedup' },
+    { label: 'VECTOR_INDEX', value: '10K', desc: 'Semantic search tokens' },
+    { label: 'PARSING_STABILITY', value: '99.4%', desc: 'Structured JSON output' },
+  ]
+};
+
+function ProjectCardSkeleton() {
+  return (
+    <div className="rounded-xl bg-zinc-900/40 border border-zinc-800/50 p-6 flex flex-col justify-between h-[390px] animate-pulse">
+      <div className="space-y-4">
+        <div className="flex gap-2">
+          <div className="h-5 w-16 bg-zinc-700 rounded" />
+          <div className="h-5 w-20 bg-zinc-700 rounded" />
+        </div>
+        <div className="h-6 w-3/4 bg-zinc-700 rounded" />
+        <div className="h-4 w-full bg-zinc-700/60 rounded" />
+        <div className="h-4 w-5/6 bg-zinc-700/60 rounded" />
+        
+        {/* Mock Result box skeleton */}
+        <div className="p-3.5 rounded-lg border border-zinc-700/40 bg-zinc-900/40 space-y-2 mt-4">
+          <div className="h-3 w-20 bg-zinc-700 rounded animate-pulse" />
+          <div className="h-4 w-full bg-zinc-700/40 rounded animate-pulse" />
+        </div>
+      </div>
+      <div className="h-4 w-24 bg-zinc-700 rounded mt-4 animate-pulse" />
+    </div>
+  );
+}
+
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>(FALLBACK_PROJECTS);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
+  const [copiedLink, setCopiedLink] = useState<string | null>(null);
+
+  // Monitor selectedProject to apply background body scroll lock
+  useEffect(() => {
+    if (selectedProject) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedProject]);
 
   useEffect(() => {
     async function fetchProjects() {
@@ -82,189 +140,220 @@ export default function Home() {
       }
     }
 
-    fetchProjects();
+    const timer = setTimeout(() => {
+      fetchProjects();
+    }, 400);
+
+    return () => clearTimeout(timer);
   }, []);
 
-  // Framer Motion Variants for Grid Fade-In
-  const gridContainerVariants = {
-    hidden: { opacity: 0 },
+  const handleCopyToClipboard = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedLink(id);
+    setTimeout(() => setCopiedLink(null), 2000);
+  };
+
+  // Viewport entrance motion transitions
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 15 },
     show: {
       opacity: 1,
+      y: 0,
       transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.1
+        duration: 0.5,
+        ease: 'easeOut'
       }
     }
   };
 
   const cardVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 15 },
     show: { 
       opacity: 1, 
       y: 0, 
       transition: { 
-        type: 'spring', 
-        stiffness: 100, 
-        damping: 15 
+        duration: 0.5,
+        ease: 'easeOut'
       } 
     }
   };
 
   return (
-    <div className="relative min-h-[calc(100vh-80px)] flex flex-col items-center justify-center bg-grid-pattern px-4 sm:px-6 lg:px-8">
-      {/* Background glow effects */}
-      <div className="absolute top-1/4 left-1/4 -z-10 h-72 w-72 rounded-full bg-brand-accent/15 blur-3xl" />
-      <div className="absolute bottom-1/4 right-1/4 -z-10 h-72 w-72 rounded-full bg-brand-teal/10 blur-3xl" />
+    <div className="relative min-h-[calc(100vh-80px)] flex flex-col items-center justify-center bg-transparent text-zinc-100 px-4 sm:px-6 lg:px-8">
+      {/* Grid Overlay background lines */}
+      <div className="absolute inset-0 bg-grid-pattern opacity-45 pointer-events-none -z-20" />
 
-      {/* Hero Section */}
-      <section id="home" className="max-w-4xl w-full text-center space-y-8 py-20">
-        {/* Status Badge */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-card border border-brand-border/60 text-xs font-medium text-brand-teal">
-          <span className="h-2 w-2 rounded-full bg-brand-teal animate-pulse" />
-          Available for new opportunities
-        </div>
-
+      {/* Hero Section: Centered minimalist presentation layout */}
+      <motion.section
+        id="home"
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+        className="max-w-4xl w-full py-24 md:py-32 flex flex-col items-center justify-center text-center space-y-8"
+      >
         {/* Title */}
-        <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-white leading-none">
-          Hi, I am a <br className="sm:hidden" />
-          <span className="text-gradient-indigo-teal">Full-Stack AI Engineer</span>
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.15] font-sans">
+          Engineering Scalable <br />
+          <span className="text-blue-500">AI & Data Systems</span>
         </h1>
 
         {/* Subtitle */}
-        <p className="max-w-2xl mx-auto text-base sm:text-xl text-brand-text-secondary leading-relaxed">
-          I design, build, and deploy autonomous agent systems, high-performance web applications, and intelligent database architectures.
+        <p className="max-w-2xl text-base sm:text-lg text-zinc-400 leading-relaxed font-sans font-normal">
+          Developing high-performance data transformation loops, robust relational database structures with strict security parameters, and modern model serving endpoints.
         </p>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 w-full sm:w-auto font-sans font-semibold text-sm">
           <a
             href="#projects"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-brand-accent hover:bg-brand-accent-hover text-white font-medium transition-all duration-200"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded border border-zinc-700 bg-blue-600 hover:bg-blue-500 text-white tracking-wide transition-all duration-200 shadow-lg shadow-blue-500/10"
           >
-            Explore Projects
-            <ArrowRight className="w-4 h-4" />
+            View Case Studies
+            <ArrowRight className="w-3.5 h-3.5" />
           </a>
           <a
             href="#contact"
-            className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded-full bg-brand-card hover:bg-brand-border/60 border border-brand-border/80 text-white font-medium transition-all duration-200"
+            className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded border border-zinc-700 bg-zinc-800/60 hover:bg-zinc-800 text-zinc-300 hover:text-white tracking-wide transition-all duration-200"
           >
             Get In Touch
           </a>
         </div>
-      </section>
+      </motion.section>
 
       {/* About Section */}
-      <section id="about" className="max-w-5xl w-full border-t border-brand-border/60 py-20 my-10">
+      <motion.section
+        id="about"
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-120px" }}
+        variants={sectionVariants}
+        className="max-w-5xl w-full border-t border-zinc-800 py-20 my-10"
+      >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="p-6 rounded-2xl bg-brand-card/45 border border-brand-border/40 backdrop-blur-sm space-y-4">
-            <div className="h-10 w-10 rounded-xl bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center text-brand-accent">
-              <Terminal className="w-5 h-5" />
+          <div className="p-6 rounded-xl bg-zinc-900/40 border border-zinc-800/50 backdrop-blur-sm space-y-4 hover:border-zinc-700/50 transition-all duration-300 terminal-glow-hover">
+            <div className="h-9 w-9 rounded bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+              <Terminal className="w-4 h-4" />
             </div>
-            <h3 className="text-lg font-semibold text-white">Frontend Architecture</h3>
-            <p className="text-sm text-brand-text-secondary">
-              Crafting fluid, accessible user interfaces using Next.js, React, Tailwind CSS, and Framer Motion.
+            <h3 className="text-sm font-sans font-bold text-zinc-100 uppercase tracking-wider">System Design & Frontend</h3>
+            <p className="text-xs text-zinc-400 leading-relaxed font-sans">
+              Developing frontends using Next.js App Router, React 19, TypeScript, and Tailwind CSS. Optimizing bundle size and page layouts.
             </p>
           </div>
 
-          <div className="p-6 rounded-2xl bg-brand-card/45 border border-brand-border/40 backdrop-blur-sm space-y-4">
-            <div className="h-10 w-10 rounded-xl bg-brand-teal/10 border border-brand-teal/20 flex items-center justify-center text-brand-teal">
-              <Cpu className="w-5 h-5" />
+          <div className="p-6 rounded-xl bg-zinc-900/40 border border-zinc-800/50 backdrop-blur-sm space-y-4 hover:border-zinc-700/50 transition-all duration-300 terminal-glow-hover">
+            <div className="h-9 w-9 rounded bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+              <Cpu className="w-4 h-4" />
             </div>
-            <h3 className="text-lg font-semibold text-white">AI & Agentic Systems</h3>
-            <p className="text-sm text-brand-text-secondary">
-              Integrating LLM inference, embedding pipelines, retrieval systems, and autonomous worker agents.
+            <h3 className="text-sm font-sans font-bold text-zinc-100 uppercase tracking-wider">AI & Pipeline Engineering</h3>
+            <p className="text-xs text-zinc-400 leading-relaxed font-sans">
+              Configuring feature transformation batches, pipeline automation workflows, LightGBM classifiers, and LLM orchestration schemas.
             </p>
           </div>
 
-          <div className="p-6 rounded-2xl bg-brand-card/45 border border-brand-border/40 backdrop-blur-sm space-y-4">
-            <div className="h-10 w-10 rounded-xl bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center text-brand-accent">
-              <Code2 className="w-5 h-5" />
+          <div className="p-6 rounded-xl bg-zinc-900/40 border border-zinc-800/50 backdrop-blur-sm space-y-4 hover:border-zinc-700/50 transition-all duration-300 terminal-glow-hover">
+            <div className="h-9 w-9 rounded bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400">
+              <Layers className="w-4 h-4" />
             </div>
-            <h3 className="text-lg font-semibold text-white">Robust Backends</h3>
-            <p className="text-sm text-brand-text-secondary">
-              Designing scalable relational database structures, enabling strict Row Level Security, and structuring modular API services.
+            <h3 className="text-sm font-sans font-bold text-zinc-100 uppercase tracking-wider">Database & Storage</h3>
+            <p className="text-xs text-zinc-400 leading-relaxed font-sans">
+              Modeling relational schemas, optimizing query indices, configuring Supabase projects, and managing strict Row Level Security (RLS) layers.
             </p>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Projects Section */}
-      <section id="projects" className="max-w-5xl w-full border-t border-brand-border/60 py-20 my-10 text-center space-y-12">
-        <div className="space-y-4">
-          <h2 className="text-3xl font-bold text-white">Featured Projects</h2>
-          <p className="text-brand-text-secondary max-w-lg mx-auto">
-            A showcase of recent work pulling dynamically from Supabase database tables. Click a card to view STAR detail breakdown.
+      <motion.section
+        id="projects"
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-120px" }}
+        variants={sectionVariants}
+        className="max-w-5xl w-full border-t border-zinc-800 py-20 my-10 space-y-12 text-left"
+      >
+        <div className="space-y-3 max-w-xl">
+          <span className="text-[9px] font-mono tracking-widest text-blue-400 font-bold uppercase">Case Studies</span>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight uppercase">Featured Deployments</h2>
+          <p className="text-zinc-400 text-xs leading-relaxed font-sans">
+            Structured case study summaries powered by SQL database records. Select a card to inspect Situation, Task, Action, and Result outlines.
           </p>
         </div>
         
-        {/* Animated Grid */}
-        <motion.div 
-          variants={gridContainerVariants}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: '-100px' }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left"
-        >
-          {projects.map((project) => (
-            <motion.div
-              key={project.id}
-              variants={cardVariants}
-              whileHover={{ y: -6, boxShadow: "0px 20px 40px rgba(99,102,241,0.15)" }}
-              onClick={() => setSelectedProject(project)}
-              className="group rounded-2xl bg-brand-card/45 border border-brand-border/40 overflow-hidden backdrop-blur-sm transition-all duration-300 hover:border-brand-accent/50 cursor-pointer flex flex-col justify-between"
-            >
-              <div>
-                <div className="aspect-video w-full relative overflow-hidden bg-brand-border/40">
-                  {project.images && project.images[0] ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img 
-                      src={project.images[0]} 
-                      alt={project.title}
-                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-brand-text-muted text-sm font-mono">
-                      [Project Image Space]
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-brand-bg/90 via-transparent to-transparent opacity-60" />
-                </div>
-                
-                <div className="p-6 space-y-4">
-                  <div className="flex flex-wrap gap-2">
-                    {project.tech_stack.slice(0, 3).map((tech) => (
-                      <span 
-                        key={tech}
-                        className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-card border border-brand-border text-brand-teal"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                    {project.tech_stack.length > 3 && (
-                      <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-card border border-brand-border text-brand-text-secondary">
-                        +{project.tech_stack.length - 3} more
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="text-xl font-semibold text-white group-hover:text-brand-accent transition-colors duration-200">
-                    {project.title}
-                  </h3>
-                  <p className="text-sm text-brand-text-secondary line-clamp-2">
-                    {project.description}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="p-6 pt-0 flex justify-between items-center text-xs text-brand-accent font-medium group-hover:underline">
-                View Project Details
-                <ArrowRight className="w-4 h-4" />
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-      </section>
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+            <div className="col-span-12 md:col-span-7">
+              <ProjectCardSkeleton />
+            </div>
+            <div className="col-span-12 md:col-span-5">
+              <ProjectCardSkeleton />
+            </div>
+          </div>
+        ) : (
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-12 gap-8 text-left"
+          >
+            {projects.map((project, index) => {
+              // Asymmetric grid column allocations (7/5 grid split)
+              const colSpanClass = index === 0 ? 'col-span-12 md:col-span-7' : 'col-span-12 md:col-span-5';
+              const classification = project.tech_stack.includes('Python') || project.tech_stack.includes('LightGBM') 
+                ? 'DATA PIPELINE' 
+                : 'LLM SYSTEM';
 
-      {/* STAR Detail Modal / Overlay using AnimatePresence */}
+              return (
+                <motion.div
+                  key={project.id}
+                  variants={cardVariants}
+                  onClick={() => setSelectedProject(project)}
+                  className={`group rounded-xl bg-zinc-900/40 border border-zinc-800/50 p-6 backdrop-blur-sm transition-all cursor-pointer flex flex-col justify-between h-[390px] terminal-glow-hover ${colSpanClass}`}
+                >
+                  <div className="space-y-4">
+                    {/* Classification metadata & tech badges */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-[8px] font-mono tracking-wider text-blue-400 font-bold uppercase">
+                        {classification}
+                      </span>
+                      
+                      <div className="flex gap-1.5">
+                        {project.tech_stack.slice(0, 2).map((tech) => (
+                          <span 
+                            key={tech}
+                            className="px-2 py-0.5 rounded border border-zinc-700 bg-geminiDark font-sans text-[8px] text-zinc-400"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Project Title */}
+                    <h3 className="text-lg font-bold text-white group-hover:text-blue-400 transition-colors duration-250 font-sans tracking-tight uppercase leading-snug">
+                      {project.title}
+                    </h3>
+                    
+                    {/* Project description snippet */}
+                    <p className="text-xs text-zinc-400 leading-relaxed line-clamp-3 font-sans font-normal">
+                      {project.description}
+                    </p>
+                    
+                    {/* Key Result metric showcased directly on card face */}
+                    <div className="p-3.5 rounded-lg border border-zinc-700 bg-geminiDark/60 font-sans text-xs flex items-start gap-2.5">
+                      <span className="text-blue-500 font-bold shrink-0 font-mono text-[10px] uppercase tracking-wider">Impact:</span>
+                      <span className="text-zinc-300 leading-normal">{project.star_result}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-between items-center text-[9px] text-blue-400 font-mono uppercase tracking-wider font-semibold pt-4">
+                    <span>Inspect Case Study</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1.5 transition-transform duration-300" />
+                  </div>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+        )}
+      </motion.section>
+
+      {/* Right Slide-over Details Drawer using AnimatePresence */}
       <AnimatePresence>
         {selectedProject && (
           <motion.div
@@ -272,40 +361,42 @@ export default function Home() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setSelectedProject(null)}
-            className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 md:p-10 overflow-y-auto"
+            className="fixed inset-0 bg-geminiDark/80 backdrop-blur-sm z-50 flex justify-end"
           >
-            {/* Modal Box */}
+            {/* Slide-over Panel */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 30 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 30 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ ease: 'easeOut', duration: 0.5 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-4xl bg-brand-card border border-brand-border rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+              className="relative w-full max-w-2xl bg-[#131314] border-l border-zinc-800/50 shadow-2xl flex flex-col h-screen"
             >
-              {/* Close Button */}
-              <button
-                onClick={() => setSelectedProject(null)}
-                className="absolute top-4 right-4 z-10 p-2 rounded-full bg-brand-bg/80 border border-brand-border text-brand-text-secondary hover:text-white hover:bg-brand-card transition-all duration-200"
-                aria-label="Close modal"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              {/* Sticky Top File Header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-geminiSidebar font-mono text-[9px] text-zinc-400">
+                <span>Record Identifier: // {selectedProject.title.toUpperCase().replace(/[\s-&]+/g, '_')}.json</span>
+                <button
+                  onClick={() => setSelectedProject(null)}
+                  className="flex items-center gap-1.5 px-2.5 py-1 text-[9px] font-bold text-zinc-400 hover:text-white border border-zinc-800 hover:border-zinc-700 bg-[#131314] hover:bg-zinc-800 rounded transition-all cursor-pointer font-sans"
+                  aria-label="Close details"
+                >
+                  <span>CLOSE</span>
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
 
-              {/* Scrollable Container */}
-              <div className="overflow-y-auto p-6 sm:p-8 space-y-8">
-                {/* Header Information */}
+              {/* Scrollable details wrapper */}
+              <div className="flex-grow overflow-y-auto px-6 py-8 space-y-8 scrollbar-none">
+                {/* Title and badges */}
                 <div className="space-y-4">
-                  <h2 className="text-2xl sm:text-3xl font-bold text-white pr-10">
+                  <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight leading-snug uppercase">
                     {selectedProject.title}
                   </h2>
-                  
-                  {/* Tech stack badges */}
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5">
                     {selectedProject.tech_stack.map((tech) => (
                       <span
                         key={tech}
-                        className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-bg border border-brand-border text-brand-teal"
+                        className="px-2 py-0.5 rounded border border-zinc-700 bg-geminiDark font-mono text-[9px] text-indigo-400"
                       >
                         {tech}
                       </span>
@@ -313,127 +404,129 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* External Links */}
-                <div className="flex flex-wrap gap-4 border-b border-brand-border/60 pb-6">
-                  {selectedProject.github_link && (
-                    <a
-                      href={selectedProject.github_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-bg border border-brand-border text-sm font-medium hover:text-white hover:border-brand-accent transition-all duration-200"
-                    >
-                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
-                        <path d="M9 18c-4.51 2-5-2-7-2" />
-                      </svg>
-                      GitHub Repo
-                      <ExternalLink className="w-3.5 h-3.5 opacity-60" />
-                    </a>
-                  )}
-                  {selectedProject.live_link && (
-                    <a
-                      href={selectedProject.live_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-accent hover:bg-brand-accent-hover text-white text-sm font-medium transition-all duration-200"
-                    >
-                      Live Demo
-                      <ExternalLink className="w-4 h-4" />
-                    </a>
-                  )}
-                </div>
-
-                {/* Main Body Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  {/* Left Column: Description & Key Features */}
-                  <div className="lg:col-span-2 space-y-6">
-                    <div className="space-y-2">
-                      <h3 className="text-sm font-semibold uppercase tracking-wider text-brand-text-muted">Project Overview</h3>
-                      <p className="text-brand-text-secondary text-sm sm:text-base leading-relaxed">
-                        {selectedProject.description}
-                      </p>
-                    </div>
-
-                    <div className="space-y-4">
-                      <h3 className="text-sm font-semibold uppercase tracking-wider text-brand-text-muted">Key Features</h3>
-                      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-brand-text-secondary">
-                        {selectedProject.key_features.map((feature, i) => (
-                          <li key={i} className="flex items-start gap-2 bg-brand-bg/50 border border-brand-border/40 p-3 rounded-xl">
-                            <span className="h-5 w-5 shrink-0 rounded-full bg-brand-teal/10 border border-brand-teal/20 flex items-center justify-center text-brand-teal">
-                              <Check className="w-3 h-3" />
-                            </span>
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
-                  {/* Right Column: Hero Banner Image */}
-                  <div className="hidden lg:block rounded-xl overflow-hidden border border-brand-border/60 aspect-square relative bg-brand-bg">
-                    {selectedProject.images && selectedProject.images[0] ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={selectedProject.images[0]}
-                        alt={selectedProject.title}
-                        className="object-cover w-full h-full"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center text-brand-text-muted text-xs font-mono">
-                        [Banner Space]
+                {/* Quantitative Metric Stat Grid */}
+                {DRAWER_STATS[selectedProject.id] && (
+                  <div className="grid grid-cols-3 gap-3 border-y border-zinc-800 py-6">
+                    {DRAWER_STATS[selectedProject.id].map((stat) => (
+                      <div key={stat.label} className="bg-geminiDark/50 border border-zinc-800 p-3 rounded-lg font-mono text-left">
+                        <div className="text-[8px] text-zinc-500 font-bold uppercase tracking-wider">{stat.label}</div>
+                        <div className="text-xl font-black text-zinc-100 mt-1 select-all">{stat.value}</div>
+                        <div className="text-[9px] text-zinc-400 mt-1 leading-tight font-sans">{stat.desc}</div>
                       </div>
-                    )}
+                    ))}
+                  </div>
+                )}
+
+                {/* Overviews & Key Features */}
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <span className="text-[9px] font-mono tracking-widest text-zinc-500 font-bold uppercase block">Project Overview</span>
+                    <p className="text-zinc-300 text-xs sm:text-sm leading-relaxed font-sans">
+                      {selectedProject.description}
+                    </p>
+                  </div>
+
+                  <div className="space-y-3">
+                    <span className="text-[9px] font-mono tracking-widest text-zinc-500 font-bold uppercase block">Key Features</span>
+                    <ul className="grid grid-cols-1 gap-2 text-xs text-zinc-400">
+                      {selectedProject.key_features.map((feature, i) => (
+                        <li key={i} className="flex items-start gap-2.5 bg-geminiDark/60 border border-zinc-800 p-3.5 rounded-lg font-sans">
+                          <span className="h-4.5 w-4.5 shrink-0 rounded bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400">
+                            <Check className="w-3 h-3" />
+                          </span>
+                          <span className="text-zinc-300">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
 
-                {/* STAR Method Section */}
-                <div className="space-y-4 border-t border-brand-border/60 pt-6">
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-brand-text-muted">STAR Method Case Study</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* STAR Context Block */}
+                <div className="space-y-4 border-t border-zinc-800 pt-6">
+                  <span className="text-[9px] font-mono tracking-widest text-zinc-500 font-bold uppercase block">System Execution Report (S.T.A.R.)</span>
+                  
+                  <div className="space-y-3 text-left">
                     {/* Situation */}
-                    <div className="p-5 rounded-2xl bg-brand-bg border border-brand-border/60 space-y-2">
+                    <div className="p-4 rounded-lg bg-geminiDark/40 border border-zinc-800 space-y-1.5">
                       <div className="flex items-center gap-2">
-                        <span className="h-6 w-6 rounded-full bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center text-xs font-bold text-brand-accent">S</span>
-                        <h4 className="text-sm font-semibold text-white">Situation</h4>
+                        <span className="h-5 w-5 rounded bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-[9px] font-mono font-bold text-blue-400">S</span>
+                        <h4 className="text-[10px] font-sans font-bold uppercase text-zinc-100 tracking-wider">Situation Context</h4>
                       </div>
-                      <p className="text-xs sm:text-sm text-brand-text-secondary leading-relaxed">
+                      <p className="text-xs text-zinc-400 leading-relaxed font-sans">
                         {selectedProject.star_situation || 'N/A'}
                       </p>
                     </div>
 
                     {/* Task */}
-                    <div className="p-5 rounded-2xl bg-brand-bg border border-brand-border/60 space-y-2">
+                    <div className="p-4 rounded-lg bg-geminiDark/40 border border-zinc-800 space-y-1.5">
                       <div className="flex items-center gap-2">
-                        <span className="h-6 w-6 rounded-full bg-brand-teal/10 border border-brand-teal/20 flex items-center justify-center text-xs font-bold text-brand-teal">T</span>
-                        <h4 className="text-sm font-semibold text-white">Task</h4>
+                        <span className="h-5 w-5 rounded bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-[9px] font-mono font-bold text-indigo-400">T</span>
+                        <h4 className="text-[10px] font-sans font-bold uppercase text-zinc-100 tracking-wider">Task Definition</h4>
                       </div>
-                      <p className="text-xs sm:text-sm text-brand-text-secondary leading-relaxed">
+                      <p className="text-xs text-zinc-400 leading-relaxed font-sans">
                         {selectedProject.star_task || 'N/A'}
                       </p>
                     </div>
 
                     {/* Action */}
-                    <div className="p-5 rounded-2xl bg-brand-bg border border-brand-border/60 space-y-2">
+                    <div className="p-4 rounded-lg bg-geminiDark/40 border border-zinc-800 space-y-1.5">
                       <div className="flex items-center gap-2">
-                        <span className="h-6 w-6 rounded-full bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center text-xs font-bold text-brand-accent">A</span>
-                        <h4 className="text-sm font-semibold text-white">Action</h4>
+                        <span className="h-5 w-5 rounded bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-[9px] font-mono font-bold text-blue-400">A</span>
+                        <h4 className="text-[10px] font-sans font-bold uppercase text-zinc-100 tracking-wider">Action Steps Taken</h4>
                       </div>
-                      <p className="text-xs sm:text-sm text-brand-text-secondary leading-relaxed">
+                      <p className="text-xs text-zinc-400 leading-relaxed font-sans">
                         {selectedProject.star_action || 'N/A'}
                       </p>
                     </div>
 
                     {/* Result */}
-                    <div className="p-5 rounded-2xl bg-brand-bg border border-brand-border/60 space-y-2">
+                    <div className="p-4 rounded-lg bg-geminiDark/40 border border-zinc-800 space-y-1.5">
                       <div className="flex items-center gap-2">
-                        <span className="h-6 w-6 rounded-full bg-brand-teal/10 border border-brand-teal/20 flex items-center justify-center text-xs font-bold text-brand-teal">R</span>
-                        <h4 className="text-sm font-semibold text-white">Result</h4>
+                        <span className="h-5 w-5 rounded bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-[9px] font-mono font-bold text-indigo-400">R</span>
+                        <h4 className="text-[10px] font-sans font-bold uppercase text-zinc-100 tracking-wider">Measurable Result</h4>
                       </div>
-                      <p className="text-xs sm:text-sm text-brand-text-secondary leading-relaxed">
+                      <p className="text-xs text-zinc-400 leading-relaxed font-sans">
                         {selectedProject.star_result || 'N/A'}
                       </p>
                     </div>
                   </div>
+                </div>
+
+                {/* Copyable CLI Commands for Sources */}
+                <div className="border border-zinc-800 bg-geminiSidebar rounded-xl p-4 font-mono text-[10px] space-y-3 text-left">
+                  <span className="text-[8px] text-zinc-500 uppercase tracking-widest font-bold">// Repository Source Commands</span>
+                  
+                  {selectedProject.github_link && (
+                    <div className="flex items-center justify-between gap-4 bg-geminiDark border border-zinc-800/50 px-3 py-2 rounded text-zinc-300">
+                      <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap scrollbar-none font-mono">
+                        <span className="text-zinc-500 shrink-0">$</span>
+                        <span>git clone {selectedProject.github_link}.git</span>
+                      </div>
+                      <button
+                        onClick={() => handleCopyToClipboard(`git clone ${selectedProject.github_link}.git`, 'git')}
+                        className="text-[9px] text-indigo-400 hover:text-indigo-300 border border-zinc-800 hover:border-zinc-700 px-2 py-1 rounded bg-[#0b0b0b] transition-colors cursor-pointer shrink-0"
+                      >
+                        {copiedLink === 'git' ? 'COPIED' : <Copy className="w-2.5 h-2.5" />}
+                      </button>
+                    </div>
+                  )}
+
+                  {selectedProject.live_link && (
+                    <div className="flex items-center justify-between gap-4 bg-geminiDark border border-zinc-800/50 px-3 py-2 rounded text-zinc-300">
+                      <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap scrollbar-none font-mono">
+                        <span className="text-zinc-500 shrink-0">$</span>
+                        <span>curl -I {selectedProject.live_link}</span>
+                      </div>
+                      <a
+                        href={selectedProject.live_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[9px] text-emerald-400 hover:text-emerald-300 border border-zinc-800 hover:border-zinc-700 px-2.5 py-1 rounded bg-[#0b0b0b] transition-colors shrink-0 font-bold"
+                      >
+                        EXECUTE
+                      </a>
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -441,21 +534,39 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* Contact Section */}
-      <section id="contact" className="max-w-3xl w-full border-t border-brand-border/60 py-20 my-10 text-center space-y-8">
-        <h2 className="text-3xl font-bold text-white">Let&apos;s Build Something Together</h2>
-        <p className="text-brand-text-secondary max-w-md mx-auto">
-          Interested in collaborating or hiring me for a project? Drop a message or check out my profiles.
-        </p>
-        <div className="inline-flex gap-4">
-          <a
-            href="mailto:hello@example.com"
-            className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-brand-accent hover:bg-brand-accent-hover text-white font-medium transition-all duration-200"
-          >
-            Send Email
-          </a>
+      {/* Contact Section with Subtle Radial Gradient Backdrop */}
+      <motion.section
+        id="contact"
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-120px" }}
+        variants={sectionVariants}
+        className="relative max-w-3xl w-full border border-zinc-800/50 py-16 my-10 text-center space-y-8 overflow-hidden rounded-xl bg-zinc-900/40 backdrop-blur-sm px-8 sm:px-12"
+      >
+        {/* Radial Gradient Backdrop for smooth visual separation */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.03)_0%,transparent_70%)] pointer-events-none" />
+
+        <div className="relative z-10 space-y-6">
+          <span className="text-[9px] font-mono tracking-widest text-blue-400 font-bold uppercase block">Secure Connection</span>
+          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight uppercase">Let&apos;s Connect</h2>
+          <p className="text-zinc-400 text-xs sm:text-sm max-w-md mx-auto leading-relaxed">
+            Interested in data pipelines, machine learning serving architectures, or custom backend integrations? Establish contact.
+          </p>
+          <div className="pt-2">
+            <a
+              href="mailto:hello@example.com"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-950 bg-white hover:bg-zinc-200 rounded transition-all duration-200"
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <rect width="20" height="16" x="2" y="4" rx="2" />
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+              </svg>
+              Email Contact
+            </a>
+          </div>
         </div>
-      </section>
+      </motion.section>
     </div>
   );
 }
+
