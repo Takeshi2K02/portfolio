@@ -91,5 +91,20 @@ body::before {
     linear-gradient(to bottom, rgba(255, 255, 255, 0.007) 1px, transparent 1px);
 }
 
+/* Global scroll behavior & hardware acceleration */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px; /* Offset for floating navigation dock */
+}
+
+/* Optimize render performance for animating elements */
+.gpu-layer {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform, opacity;
+}
+
+
 
 

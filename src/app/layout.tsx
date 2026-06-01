@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Developer Portfolio",
-  description: "A dynamic showcase of projects and professional experience.",
+  title: "Engineering Scalable AI & Data Systems | Associate AI & Data Engineer Portfolio",
+  description: "Explore high-performance data pipelines, LLM agentic code assistants, dynamic ETL architectures, and database structures designed by an Associate AI & Data Engineer.",
 };
 
 export default function RootLayout({

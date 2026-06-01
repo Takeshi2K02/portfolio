@@ -13,42 +13,78 @@ INSERT INTO projects (
     star_result
 ) VALUES 
 (
-    'Intelligent Supply Chain & Fleet Optimization Engine',
-    'An AI-powered forecasting and optimization system engineered to predict multi-modal transit bottlenecks and streamline fleet distribution algorithms for high-volume logistics.',
+    'Multi-Modal AI Tutoring System',
+    'A GenAI-powered tutoring system using Agentic AI and Vector Embeddings for context-aware, goal-driven learning.',
     ARRAY[
-        'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1519003722824-192d992a6020?auto=format&fit=crop&w=800&q=80'
+        'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80'
     ],
-    'https://logistics-optimization.example.com',
-    'https://github.com/example/logistics-optimization',
-    ARRAY['Python', 'FastAPI', 'Scikit-Learn', 'LightGBM', 'Supabase', 'PostgreSQL'],
+    NULL,
+    'https://github.com/Takeshi2K02/ai-tutoring-system',
+    ARRAY['LangChain', 'Tree of Thought', 'ReAct', 'Vector Embeddings', 'LLMs', 'Python', 'OpenCV'],
     ARRAY[
-        'Real-time route bottleneck alerting',
-        'Predictive transit delay mapping',
-        'Automated fleet relocation recommendations'
+        'Dynamic instructional flow planning',
+        'RL-based teaching optimization',
+        'CV-based attention tracking modules'
     ],
-    'A massive multi-modal logistics operation faced structural delivery variances and increased operational costs due to unforeseen transit bottlenecks and inefficient vehicle positioning.',
-    'Build an end-to-end predictive analytics engine to anticipate congestion periods and optimize vehicle allocation metrics across regional hubs.',
-    'Engineered robust feature sets from extensive historical GPS transit logs, trained a highly tuned LightGBM regressor to forecast delivery delays, and exposed predictions via a secure, modular FastAPI routing structure.',
-    'Successfully reduced delivery arrival variance by 14%, optimized asset allocation efficiency, and dramatically mitigated redundant transit run-times.'
+    'Online tutoring frameworks lacked context-aware, adaptive pacing, leading to significant learning gaps and low user attention retention.',
+    'Develop a personalized, goal-driven tutoring service that dynamically steers educational content and tracks student engagement in real-time.',
+    'Engineered a cognitive agentic structure using LangChain and a custom Tree of Thought/ReAct loop, integrating an OpenCV module for visual attention monitoring.',
+    'Successfully bridged instructional gaps by tailoring content streams based on student interaction histories and physical engagement metrics.'
 ),
 (
-    'Agentic Code Review & Optimization Assistant',
-    'A production-ready LLM-powered development workflow agent that automatically reviews git patch sets, flags optimization vulnerabilities, and submits refactoring suggestions.',
+    'AI-Powered Learning Platform',
+    'Full-stack platform enabling automated course generation and adaptive quiz evaluation.',
     ARRAY[
-        'https://images.unsplash.com/photo-1607799279861-4dd421887fb3?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=800&q=80'
-      ],
-    'https://agentic-reviewer.example.com',
-    'https://github.com/example/agentic-reviewer',
-    ARRAY['Next.js', 'TypeScript', 'Gemini API', 'Supabase RLS', 'Vector Embeddings'],
-    ARRAY[
-        'Automated code style/security analysis',
-        'Context-aware semantic patch checks',
-        'Contextual embedding search over codebase structures'
+        'https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=800&q=80'
     ],
-    'Development speed in fast-moving engineering teams was constrained by manual, repetitive merge request reviews and static code analysis noise.',
-    'Architect a reliable, context-aware LLM pipeline capable of acting as an autonomous peer reviewer to flag critical logic flaws prior to main branch integration.',
-    'Built an asynchronous processing pipeline utilizing the Gemini API to parse diff fragments, built a vector retrieval system over regional coding standards, and structured strict JSON schemas for precise parsing.',
-    'Accelerated continuous integration code validation cycles by 35% and captured critical edge-case structural exceptions prior to production deployment.'
+    NULL,
+    'https://github.com/Takeshi2K02/ai-learning-platform',
+    ARRAY['MERN Stack', 'Gemini API', 'Python', 'YouTube Data API', 'React.js', 'Node.js', 'MongoDB'],
+    ARRAY[
+        'LLM-driven course syllabus generation',
+        'Dynamic YouTube video recommendations',
+        'Module engagement scoring pipelines'
+    ],
+    'Manually curating educational materials and designing personalized quiz evaluations is highly time-consuming for content creators and teachers.',
+    'Design an end-to-end full-stack web platform that automates high-quality course generation and dynamically tracks student progress.',
+    'Integrated the Gemini API for structured module generation, wrote Python workers to process documents, and utilized the YouTube Data API to fetch supplementary tutorials.',
+    'Delivered a responsive learning dashboard offering immediate automated course creation, module progress scores, and adaptive quizzes.'
+),
+(
+    'E-commerce Recommendation System',
+    'Personalized recommendation engine using collaborative, content-based, and hybrid filtering.',
+    ARRAY[
+        'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80'
+    ],
+    NULL,
+    'https://github.com/Takeshi2K02/ecommerce-recommendation',
+    ARRAY['Python', 'Flask', 'PhpMyAdmin', 'Jupyter Notebook', 'MySQL'],
+    ARRAY[
+        'Collaborative filtering product recommendations',
+        'Content-based similarity vectors',
+        'Hybrid user recommendation pipeline'
+    ],
+    'Online retail storefronts struggle with low click-through rates and high basket abandonment rates due to generic, static product discovery interfaces.',
+    'Build a modular, low-latency recommendation engine that dynamically targets product listings to match historical user preferences.',
+    'Developed and optimized collaborative and content-based recommendation algorithms in Jupyter Notebook, exposing inference endpoints via a Flask API connected to PhpMyAdmin.',
+    'Generated accurate recommendation arrays that map user profiles to relevant products, boosting click-through performance.'
+),
+(
+    'Accident Severity Prediction System',
+    'Machine learning injury risk assessment system evaluating five separate model architectures.',
+    ARRAY[
+        'https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&w=800&q=80'
+    ],
+    NULL,
+    'https://github.com/Takeshi2K02/accident-severity-prediction',
+    ARRAY['Python', 'Flask', 'JavaScript', 'Jupyter Notebook', 'Scikit-Learn'],
+    ARRAY[
+        'Injury risk assessment scores',
+        '5 model architecture comparisons',
+        'Environmental telemetry evaluation'
+    ],
+    'Transit authorities lacked granular data models to analyze structural road hazards and anticipate severity indicators in motor vehicle accidents.',
+    'Construct a machine learning pipeline to estimate injury risks by evaluating weather, spatial-temporal features, and road conditions.',
+    'Trained and compared five distinct classification architectures using Scikit-Learn, wrapping the top-performing estimator in a Flask service with an interactive UI.',
+    'Achieved high prediction precision, providing planners with an analytical system to model traffic hazards and dispatch response resources.'
 );
