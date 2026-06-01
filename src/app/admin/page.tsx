@@ -10,18 +10,23 @@ import {
   Plus, 
   Check, 
   LogOut, 
-  Terminal
+  Terminal,
+  Loader2,
+  Upload
 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminPortal() {
   const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+  
+  // Auth Form Fields
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(false);
 
-  // Form Fields
+  // Project Form Fields
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
@@ -37,6 +42,7 @@ export default function AdminPortal() {
   const [result, setResult] = useState('');
 
   const [formLoading, setFormLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [formSuccess, setFormSuccess] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -44,10 +50,12 @@ export default function AdminPortal() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      setLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -73,6 +81,41 @@ export default function AdminPortal() {
     await supabase.auth.signOut();
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    
+    setUploading(true);
+    setFormError(null);
+    
+    try {
+      const file = e.target.files[0];
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const filePath = `project-covers/${fileName}`;
+
+      // Upload file to 'portfolio' storage bucket
+      const { error: uploadError } = await supabase.storage
+        .from('portfolio')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('portfolio')
+        .getPublicUrl(filePath);
+
+      setImageUrl(publicUrl);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'File upload failed. Ensure the storage bucket "portfolio" exists.';
+      setFormError(errorMsg);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!session) {
@@ -90,7 +133,7 @@ export default function AdminPortal() {
       .filter(Boolean);
     
     const featuresArray = keyFeatures
-      .split('\n')
+      .split(',')
       .map((item) => item.trim())
       .filter(Boolean);
 
@@ -137,6 +180,15 @@ export default function AdminPortal() {
       setFormLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0e0e10] flex items-center justify-center text-zinc-400 font-mono text-xs">
+        <Loader2 className="w-4 h-4 animate-spin text-blue-500 mr-2" />
+        <span>Initializing auth session state...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0e0e10] text-zinc-100 px-4 py-12 relative flex flex-col justify-center items-center">
@@ -186,7 +238,7 @@ export default function AdminPortal() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-[#0e0e10] focus:border-blue-500 text-xs text-zinc-200 outline-none transition-colors"
+                  className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-zinc-900/50 focus:border-blue-500 text-xs text-zinc-200 outline-none transition-colors"
                   placeholder="admin@example.com"
                 />
               </div>
@@ -198,7 +250,7 @@ export default function AdminPortal() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-[#0e0e10] focus:border-blue-500 text-xs text-zinc-200 outline-none transition-colors"
+                  className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-zinc-900/50 focus:border-blue-500 text-xs text-zinc-200 outline-none transition-colors"
                   placeholder="••••••••••••"
                 />
               </div>
@@ -212,9 +264,16 @@ export default function AdminPortal() {
               <button
                 type="submit"
                 disabled={authLoading}
-                className="w-full py-3 rounded bg-blue-600 hover:bg-blue-500 text-white font-mono text-[10px] font-bold uppercase tracking-widest transition-all disabled:opacity-50"
+                className="w-full py-3 rounded bg-blue-600 hover:bg-blue-500 text-white font-mono text-[10px] font-bold uppercase tracking-widest transition-all disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                {authLoading ? 'Verifying Session...' : 'Authenticate Access'}
+                {authLoading ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                    <span>Verifying Session...</span>
+                  </>
+                ) : (
+                  <span>Authenticate Access</span>
+                )}
               </button>
             </form>
           </motion.div>
@@ -257,7 +316,7 @@ export default function AdminPortal() {
                     required
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-[#0e0e10] focus:border-blue-500 text-xs text-zinc-200 outline-none transition-all"
+                    className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-zinc-900/50 focus:border-blue-500 text-xs text-zinc-200 outline-none transition-all"
                     placeholder="e.g. Intelligent System Pipeline"
                   />
                 </div>
@@ -268,9 +327,34 @@ export default function AdminPortal() {
                     type="text"
                     value={imageUrl}
                     onChange={(e) => setImageUrl(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-[#0e0e10] focus:border-blue-500 text-xs text-zinc-200 outline-none transition-all"
+                    className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-zinc-900/50 focus:border-blue-500 text-xs text-zinc-200 outline-none transition-all"
                     placeholder="https://images.unsplash.com/..."
                   />
+                </div>
+              </div>
+
+              {/* Upload and File Picker Row */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-mono tracking-wider text-zinc-400 uppercase">Or Upload Graphic Asset</label>
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2 px-4 py-2.5 rounded border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-850 text-xs text-zinc-300 hover:text-white cursor-pointer transition-colors outline-none">
+                    {uploading ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-400" />
+                    ) : (
+                      <Upload className="w-3.5 h-3.5" />
+                    )}
+                    <span>{uploading ? 'Uploading File...' : 'Choose File Asset'}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      disabled={uploading}
+                      className="hidden"
+                    />
+                  </label>
+                  <span className="text-[10px] font-mono text-zinc-500 truncate max-w-xs sm:max-w-md">
+                    {imageUrl ? `Selected: ${imageUrl}` : '// No file chosen'}
+                  </span>
                 </div>
               </div>
 
@@ -282,7 +366,7 @@ export default function AdminPortal() {
                   rows={3}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-[#0e0e10] focus:border-blue-500 text-xs text-zinc-200 outline-none transition-all resize-none"
+                  className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-zinc-900/50 focus:border-blue-500 text-xs text-zinc-200 outline-none transition-all resize-none"
                   placeholder="Summarize the core functionality and scope of the build..."
                 />
               </div>
@@ -295,7 +379,7 @@ export default function AdminPortal() {
                     type="text"
                     value={githubLink}
                     onChange={(e) => setGithubLink(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-[#0e0e10] focus:border-blue-500 text-xs text-zinc-200 outline-none transition-all"
+                    className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-zinc-900/50 focus:border-blue-500 text-xs text-zinc-200 outline-none transition-all"
                     placeholder="https://github.com/..."
                   />
                 </div>
@@ -306,7 +390,7 @@ export default function AdminPortal() {
                     type="text"
                     value={liveLink}
                     onChange={(e) => setLiveLink(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-[#0e0e10] focus:border-blue-500 text-xs text-zinc-200 outline-none transition-all"
+                    className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-zinc-900/50 focus:border-blue-500 text-xs text-zinc-200 outline-none transition-all"
                     placeholder="https://..."
                   />
                 </div>
@@ -318,7 +402,7 @@ export default function AdminPortal() {
                     required
                     value={techStack}
                     onChange={(e) => setTechStack(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-[#0e0e10] focus:border-blue-500 text-xs text-zinc-200 outline-none transition-all"
+                    className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-zinc-900/50 focus:border-blue-500 text-xs text-zinc-200 outline-none transition-all"
                     placeholder="Python, Flask, React"
                   />
                 </div>
@@ -326,14 +410,14 @@ export default function AdminPortal() {
 
               {/* Key Features */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-mono tracking-wider text-zinc-400 uppercase">Key Features (one per line)</label>
-                <textarea
+                <label className="text-[10px] font-mono tracking-wider text-zinc-400 uppercase">Key Features (comma-separated)</label>
+                <input
+                  type="text"
                   required
-                  rows={3}
                   value={keyFeatures}
                   onChange={(e) => setKeyFeatures(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-[#0e0e10] focus:border-blue-500 text-xs text-zinc-200 outline-none transition-all resize-none"
-                  placeholder="Automated data parsing pipeline&#10;Real-time query execution monitoring"
+                  className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-zinc-900/50 focus:border-blue-500 text-xs text-zinc-200 outline-none transition-all"
+                  placeholder="Automated data parsing pipeline, Real-time execution monitor"
                 />
               </div>
 
@@ -351,7 +435,7 @@ export default function AdminPortal() {
                       rows={2}
                       value={situation}
                       onChange={(e) => setSituation(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-[#0e0e10] focus:border-blue-500 text-xs text-zinc-200 outline-none transition-all resize-none"
+                      className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-zinc-900/50 focus:border-blue-500 text-xs text-zinc-200 outline-none transition-all resize-none"
                       placeholder="Outline the initial business case or bottleneck..."
                     />
                   </div>
@@ -365,7 +449,7 @@ export default function AdminPortal() {
                       rows={2}
                       value={task}
                       onChange={(e) => setTask(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-[#0e0e10] focus:border-blue-500 text-xs text-zinc-200 outline-none transition-all resize-none"
+                      className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-zinc-900/50 focus:border-blue-500 text-xs text-zinc-200 outline-none transition-all resize-none"
                       placeholder="Describe the structural objective..."
                     />
                   </div>
@@ -379,7 +463,7 @@ export default function AdminPortal() {
                       rows={2}
                       value={action}
                       onChange={(e) => setAction(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-[#0e0e10] focus:border-blue-500 text-xs text-zinc-200 outline-none transition-all resize-none"
+                      className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-zinc-900/50 focus:border-blue-500 text-xs text-zinc-200 outline-none transition-all resize-none"
                       placeholder="Detail the implementation workflows and code steps..."
                     />
                   </div>
@@ -393,7 +477,7 @@ export default function AdminPortal() {
                       rows={2}
                       value={result}
                       onChange={(e) => setResult(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-[#0e0e10] focus:border-blue-500 text-xs text-zinc-200 outline-none transition-all resize-none"
+                      className="w-full px-4 py-2.5 rounded border border-zinc-800 bg-zinc-900/50 focus:border-blue-500 text-xs text-zinc-200 outline-none transition-all resize-none"
                       placeholder="State the quantitative metrics and outcome values..."
                     />
                   </div>
@@ -420,7 +504,11 @@ export default function AdminPortal() {
                 disabled={formLoading}
                 className="w-full py-3.5 rounded bg-blue-600 hover:bg-blue-500 text-white font-mono text-[10px] font-bold uppercase tracking-widest transition-all disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                <Plus className="w-3.5 h-3.5" />
+                {formLoading ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                ) : (
+                  <Plus className="w-3.5 h-3.5 text-white" />
+                )}
                 <span>{formLoading ? 'Executing Data Insert...' : 'Create Project Record'}</span>
               </button>
             </form>

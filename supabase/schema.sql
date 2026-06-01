@@ -42,3 +42,20 @@ CREATE POLICY "Allow authenticated delete" ON projects
     FOR DELETE
     TO authenticated
     USING (true);
+
+-- Create skills table
+CREATE TABLE IF NOT EXISTS skills (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    category_name TEXT NOT NULL,       -- e.g., 'AI ARCHITECTURE & AGENTS'
+    skill_name TEXT NOT NULL,          -- e.g., 'LLMs (Gemini / OpenAI)'
+    brand_color_theme TEXT NOT NULL,   -- e.g., 'indigo', 'blue', 'emerald', 'amber', 'cyan'
+    display_order INT NOT NULL,        -- For sorting columns/items smoothly
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable Row Level Security (RLS)
+ALTER TABLE skills ENABLE ROW LEVEL SECURITY;
+
+-- Create public read policy
+CREATE POLICY "Allow public read access to skills" 
+ON skills FOR SELECT USING (true);

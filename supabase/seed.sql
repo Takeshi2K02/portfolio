@@ -88,3 +88,29 @@ INSERT INTO projects (
     'Trained and compared five distinct classification architectures using Scikit-Learn, wrapping the top-performing estimator in a Flask service with an interactive UI.',
     'Achieved high prediction precision, providing planners with an analytical system to model traffic hazards and dispatch response resources.'
 );
+
+-- Seed data for skills table
+INSERT INTO skills (category_name, skill_name, brand_color_theme, display_order) VALUES
+-- AI ARCHITECTURE & AGENTS
+('AI ARCHITECTURE & AGENTS', 'LLMs (Gemini / OpenAI)', 'indigo', 10),
+('AI ARCHITECTURE & AGENTS', 'Agentic AI (LangChain / Tree of Thought)', 'indigo', 20),
+('AI ARCHITECTURE & AGENTS', 'RAG Pipelines (ChromaDB)', 'indigo', 30),
+('AI ARCHITECTURE & AGENTS', 'Prompt Engineering', 'indigo', 40),
+
+-- COMPUTER VISION & INTELLIGENCE
+('COMPUTER VISION & INTELLIGENCE', 'OpenCV', 'blue', 50),
+('COMPUTER VISION & INTELLIGENCE', 'Tesseract 5', 'blue', 60),
+('COMPUTER VISION & INTELLIGENCE', 'Image Processing', 'blue', 70),
+
+-- DATA & CLOUD PLATFORMS
+('DATA & CLOUD PLATFORMS', 'SQL', 'zinc', 80),
+('DATA & CLOUD PLATFORMS', 'MongoDB', 'emerald', 90),
+('DATA & CLOUD PLATFORMS', 'AWS', 'amber', 100),
+('DATA & CLOUD PLATFORMS', 'Azure', 'cyan', 110),
+
+-- FULL-STACK ARCHITECTURE
+('FULL-STACK ARCHITECTURE', 'Python (FastAPI / Flask)', 'blue', 120),
+('FULL-STACK ARCHITECTURE', 'Node.js', 'zinc', 130),
+('FULL-STACK ARCHITECTURE', 'React.js', 'cyan', 140),
+('FULL-STACK ARCHITECTURE', 'JavaScript (ES6+)', 'zinc', 150),
+('FULL-STACK ARCHITECTURE', 'API Integration', 'zinc', 160);

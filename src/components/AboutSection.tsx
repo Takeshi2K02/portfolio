@@ -1,10 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, Variants } from 'framer-motion';
 import Image, { StaticImageData } from 'next/image';
 import jkhLogo from '@/assets/jkh_trp_logo.jpeg';
 import orelLogo from '@/assets/orel_group_logo.jpeg';
+import { supabase } from '@/lib/supabaseClient';
 
 interface TimelineItem {
   role: string;
@@ -38,54 +39,127 @@ const EXPERIENCE_TIMELINE: TimelineItem[] = [
   }
 ];
 
-const SKILL_STYLE_MAP: Record<string, string> = {
-  // AI ARCHITECTURE & AGENTS
-  "LLMs (Gemini / OpenAI)": "text-indigo-400 border-indigo-900/50 bg-indigo-950/20 hover:border-indigo-400/30",
-  "Agentic AI (LangChain / Tree of Thought)": "text-indigo-400 border-indigo-900/50 bg-indigo-950/20 hover:border-indigo-400/30",
-  "RAG Pipelines (ChromaDB)": "text-indigo-400 border-indigo-900/50 bg-indigo-950/20 hover:border-indigo-400/30",
-  "Prompt Engineering": "text-indigo-400 border-indigo-900/50 bg-indigo-950/20 hover:border-indigo-400/30",
-  // COMPUTER VISION & INTELLIGENCE
-  "OpenCV": "text-blue-400 border-blue-900/50 bg-blue-950/20 hover:border-blue-400/30",
-  "Tesseract 5": "text-zinc-300 border-zinc-800/80 bg-zinc-900/40 hover:border-zinc-700/50",
-  "Image Processing": "text-blue-400 border-blue-900/50 bg-blue-950/20 hover:border-blue-400/30",
-  // DATA & CLOUD PLATFORMS
-  "SQL": "text-zinc-300 border-zinc-800/80 bg-zinc-900/40 hover:border-zinc-700/50",
-  "MongoDB": "text-emerald-400 border-emerald-900/50 bg-emerald-950/20 hover:border-emerald-400/30",
-  "AWS": "text-amber-500 border-amber-950/50 bg-amber-950/20 hover:border-amber-500/30",
-  "Azure": "text-cyan-400 border-cyan-900/50 bg-cyan-950/20 hover:border-cyan-400/30",
-  // FULL-STACK ARCHITECTURE
-  "Python (FastAPI / Flask)": "text-blue-400 border-blue-900/50 bg-blue-950/20 hover:border-blue-400/30",
-  "Node.js": "text-emerald-400 border-emerald-900/50 bg-emerald-950/20 hover:border-emerald-400/30",
-  "React.js": "text-cyan-400 border-cyan-900/50 bg-cyan-950/20 hover:border-cyan-400/30",
-  "JavaScript (ES6+)": "text-zinc-300 border-zinc-800/80 bg-zinc-900/40 hover:border-zinc-700/50",
-  "API Integration": "text-zinc-300 border-zinc-800/80 bg-zinc-900/40 hover:border-zinc-700/50"
-};
+interface Skill {
+  name: string;
+  brand_color_theme: string;
+}
 
 interface SkillCategory {
   category: string;
-  skills: string[];
+  skills: Skill[];
 }
 
-const SKILL_MATRIX: SkillCategory[] = [
+const FALLBACK_SKILLS: SkillCategory[] = [
   {
     category: "AI ARCHITECTURE & AGENTS",
-    skills: ["LLMs (Gemini / OpenAI)", "Agentic AI (LangChain / Tree of Thought)", "RAG Pipelines (ChromaDB)", "Prompt Engineering"]
+    skills: [
+      { name: "LLMs (Gemini / OpenAI)", brand_color_theme: "indigo" },
+      { name: "Agentic AI (LangChain / Tree of Thought)", brand_color_theme: "indigo" },
+      { name: "RAG Pipelines (ChromaDB)", brand_color_theme: "indigo" },
+      { name: "Prompt Engineering", brand_color_theme: "indigo" }
+    ]
   },
   {
     category: "COMPUTER VISION & INTELLIGENCE",
-    skills: ["OpenCV", "Tesseract 5", "Image Processing"]
+    skills: [
+      { name: "OpenCV", brand_color_theme: "blue" },
+      { name: "Tesseract 5", brand_color_theme: "blue" },
+      { name: "Image Processing", brand_color_theme: "blue" }
+    ]
   },
   {
     category: "DATA & CLOUD PLATFORMS",
-    skills: ["SQL", "MongoDB", "AWS", "Azure"]
+    skills: [
+      { name: "SQL", brand_color_theme: "zinc" },
+      { name: "MongoDB", brand_color_theme: "emerald" },
+      { name: "AWS", brand_color_theme: "amber" },
+      { name: "Azure", brand_color_theme: "cyan" }
+    ]
   },
   {
     category: "FULL-STACK ARCHITECTURE",
-    skills: ["Python (FastAPI / Flask)", "Node.js", "React.js", "JavaScript (ES6+)", "API Integration"]
+    skills: [
+      { name: "Python (FastAPI / Flask)", brand_color_theme: "blue" },
+      { name: "Node.js", brand_color_theme: "zinc" },
+      { name: "React.js", brand_color_theme: "cyan" },
+      { name: "JavaScript (ES6+)", brand_color_theme: "zinc" },
+      { name: "API Integration", brand_color_theme: "zinc" }
+    ]
   }
 ];
 
+const getBrandThemeClasses = (theme: string): string => {
+  switch (theme) {
+    case 'indigo':
+      return "text-indigo-400 border-indigo-900/50 bg-indigo-950/20 hover:border-indigo-400/30";
+    case 'blue':
+      return "text-blue-400 border-blue-900/50 bg-blue-950/20 hover:border-blue-400/30";
+    case 'emerald':
+      return "text-emerald-400 border-emerald-900/50 bg-emerald-950/20 hover:border-emerald-400/30";
+    case 'amber':
+      return "text-amber-500 border-amber-950/50 bg-amber-950/20 hover:border-amber-500/30";
+    case 'cyan':
+      return "text-cyan-400 border-cyan-900/50 bg-cyan-950/20 hover:border-cyan-400/30";
+    case 'zinc':
+    default:
+      return "text-zinc-300 border-zinc-800/80 bg-zinc-900/40 hover:border-zinc-700/50";
+  }
+};
+
 export default function AboutSection() {
+  const [skills, setSkills] = useState<SkillCategory[]>(FALLBACK_SKILLS);
+
+  useEffect(() => {
+    async function fetchSkills() {
+      try {
+        const { data: skillsData, error } = await supabase
+          .from('skills')
+          .select('*')
+          .order('display_order', { ascending: true });
+
+        if (error) {
+          throw error;
+        }
+
+        if (skillsData && skillsData.length > 0) {
+          // Dynamic grouping utility helper
+          const groups: Record<string, Skill[]> = {};
+          
+          skillsData.forEach((item: any) => {
+            if (!groups[item.category_name]) {
+              groups[item.category_name] = [];
+            }
+            groups[item.category_name].push({
+              name: item.skill_name,
+              brand_color_theme: item.brand_color_theme
+            });
+          });
+
+          // Order the categories to keep visual symmetry
+          const categoriesOrder = [
+            "AI ARCHITECTURE & AGENTS",
+            "COMPUTER VISION & INTELLIGENCE",
+            "DATA & CLOUD PLATFORMS",
+            "FULL-STACK ARCHITECTURE"
+          ];
+
+          const formattedSkills: SkillCategory[] = Object.keys(groups)
+            .sort((a, b) => categoriesOrder.indexOf(a) - categoriesOrder.indexOf(b))
+            .map(catName => ({
+              category: catName,
+              skills: groups[catName]
+            }));
+
+          setSkills(formattedSkills);
+        }
+      } catch (err) {
+        console.warn('Could not fetch skills from Supabase. Falling back to local data.', err);
+      }
+    }
+
+    fetchSkills();
+  }, []);
+
   const sectionRevealVariants: Variants = {
     hidden: { opacity: 0, y: 40 },
     visible: {
@@ -195,7 +269,7 @@ export default function AboutSection() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
-          {SKILL_MATRIX.map((cat, idx) => (
+          {skills.map((cat, idx) => (
             <div
               key={idx}
               className="p-5 rounded-xl border border-zinc-800/40 bg-zinc-900/10 hover:border-zinc-850 hover:bg-zinc-900/20 transition-all duration-300 flex flex-col h-full justify-between space-y-4"
@@ -213,11 +287,9 @@ export default function AboutSection() {
                     <motion.span
                       key={skIdx}
                       variants={badgeItemVariants}
-                      className={`px-3 py-1.5 rounded-md border font-sans text-[10px] transition-colors duration-250 cursor-default ${
-                        SKILL_STYLE_MAP[skill] || "text-zinc-300 border-zinc-800/80 bg-zinc-900/40"
-                      }`}
+                      className={`px-3 py-1.5 rounded-md border font-sans text-[10px] transition-colors duration-250 cursor-default ${getBrandThemeClasses(skill.brand_color_theme)}`}
                     >
-                      {skill}
+                      {skill.name}
                     </motion.span>
                   ))}
                 </motion.div>
